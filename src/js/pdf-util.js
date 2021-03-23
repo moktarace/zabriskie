@@ -17,7 +17,7 @@ export async function generatePdf(profile) {
   const pdfDoc = await PDFDocument.load(existingPdfBytes)
 
   // set pdf metadata
-  pdfDoc.setTitle('Justificatif ' + new Date().toDateString())
+  pdfDoc.setTitle(new Date().toISOString())
   pdfDoc.setCreator('')
   const page1 = pdfDoc.getPages()[0]
 

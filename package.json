@@ -13,10 +13,11 @@
     "postbuild": "cross-env-shell react-snap",
     "build:ci": "cross-env npm run build:simple",
     "postbuild:ci": "cross-env-shell react-snap",
-    "build:dev": "cross-env PUBLIC_URL='/' npm run build:simple --public-url https://moktarace.github.io/zabriskie ",
+    "build:dev": "cross-env npm run build:simple --public-url https://moktarace.github.io/zabriskie ",
     "preserve": "npm run build",
     "serve": "serve dist",
     "serve:dist": "serve dist",
+    "predeploy": "npm run build:dev",
     "deploy": "gh-pages -d dist"
   },
   "keywords": [],
