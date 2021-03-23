@@ -1,8 +1,9 @@
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib'
-import facturePdfBase from '../template.pdf'
+import facturePdfBase1 from '../template1.pdf'
+import facturePdfBase2 from '../template2.pdf'
 
-let pdfBase = facturePdfBase
-export async function generatePdf(profile) {
+
+export async function generatePdf(profile, contract) {
 
   const {
     lastname,
@@ -12,7 +13,7 @@ export async function generatePdf(profile) {
     city
   } = profile
 
-  const existingPdfBytes = await fetch(pdfBase).then((res) => res.arrayBuffer())
+  const existingPdfBytes = await fetch([facturePdfBase1, facturePdfBase2][contract]).then((res) => res.arrayBuffer())
 
   const pdfDoc = await PDFDocument.load(existingPdfBytes)
 
@@ -26,7 +27,13 @@ export async function generatePdf(profile) {
   const subNumber = contractNumber.substr(0, 8) + "E";
 
 
-  const addressFont = await pdfDoc.embedFont(StandardFonts.Helvetica)
+  let addressFont = undefined;
+  if (contract === 0) {
+    addressFont = await pdfDoc.embedFont(StandardFonts.Helvetica)
+  }
+  if (contract === 1) {
+    addressFont = await pdfDoc.embedFont(StandardFonts.TimesRoman)
+  }
   const nameFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold)
   const textFont = await pdfDoc.embedFont(StandardFonts.Helvetica)
   const drawAddressText = (text, x, y, size = 10) => {
@@ -47,17 +54,21 @@ export async function generatePdf(profile) {
   drawAddressText(`${address.toUpperCase()}`, 300, 635)
   drawAddressText(`${zipcode} ${city.toUpperCase()}`, 300, 620)
 
-  drawContractText(`${clientNumber}`, 189, 568)
-  drawContractText(`${subNumber}`, 189, 558)
-  drawContractText(`${contractNumber}`, 189, 548)
+  if (contract === 0) {
+    drawContractText(`${clientNumber}`, 189, 568)
+    drawContractText(`${subNumber}`, 189, 558)
+    drawContractText(`${contractNumber}`, 189, 548)
+    drawNameText(`${lastname.toUpperCase()} ${firstname.toUpperCase()}`, 42, 453)
+    drawText(`${address.toUpperCase()}, ${zipcode} ${city.toUpperCase()}.`, 42, 369)
+  }
 
-  drawNameText(`${lastname.toUpperCase()} ${firstname.toUpperCase()}`, 42, 453)
-
-  drawText(`${address.toUpperCase()}, ${zipcode} ${city.toUpperCase()}.`, 42, 369)
+  if (contract === 1) {
+    drawAddressText(`${contractNumber}`, 115, 555)
+    drawAddressText(`${address.toUpperCase()}`, 120, 520)
+    drawAddressText(`${zipcode} ${city.toUpperCase()}`, 120, 505)
+  }
 
   const pdfBytes = await pdfDoc.save()
-
-
 
   return new Blob([pdfBytes], { type: 'application/pdf' })
 }

@@ -147,7 +147,7 @@ export function prepareInputs(formInputs, reasonInputs, reasonFieldsetsWrapper, 
   $('#field-storedata').addEventListener('click', () => {
     updateSecureLS(formInputs)
   })
-  $('#generate-btn').addEventListener('click', async (event) => {
+  const generate = async (event, contract) => {
     event.preventDefault()
 
     const invalid = validateAriaFields()
@@ -155,7 +155,7 @@ export function prepareInputs(formInputs, reasonInputs, reasonFieldsetsWrapper, 
       return
     }
     updateSecureLS(formInputs)
-    const pdfBlob = await generatePdf(getProfile(formInputs))
+    const pdfBlob = await generatePdf(getProfile(formInputs), contract)
 
     const creationInstant = new Date()
     const creationDate = creationInstant.toLocaleDateString('fr-CA')
@@ -163,8 +163,14 @@ export function prepareInputs(formInputs, reasonInputs, reasonFieldsetsWrapper, 
       .toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
       .replace(':', '-')
 
-    downloadBlob(pdfBlob, `justificatif-${creationDate}_${creationHour}.pdf`)
+    downloadBlob(pdfBlob, `${creationDate}_${creationHour}.pdf`)
     showSnackbar(snackbar, 6000)
+  }
+  $('#generate-btn-0').addEventListener('click', async (event) => {
+    generate(event, 0)
+  })
+  $('#generate-btn-1').addEventListener('click', async (event) => {
+    generate(event, 1)
   })
 
 }
