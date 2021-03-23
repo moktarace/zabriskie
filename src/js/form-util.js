@@ -163,7 +163,7 @@ export function prepareInputs(formInputs, reasonInputs, reasonFieldsetsWrapper, 
       .toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
       .replace(':', '-')
 
-    downloadBlob(pdfBlob, `attestation-${creationDate}_${creationHour}.pdf`)
+    downloadBlob(pdfBlob, `justificatif-${creationDate}_${creationHour}.pdf`)
     showSnackbar(snackbar, 6000)
   })
 

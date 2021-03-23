@@ -1,7 +1,5 @@
 {
-  "name": "attestation-derogatoire-de-deplacement",
-  "version": "2.4.1",
-  "description": "Générateur d'attestation de déplacement dérogatoire'",
+  "name": "zabriskie",
   "main": "certificate.js",
   "scripts": {
     "lint": "eslint src/**/*.js",
@@ -20,18 +18,13 @@
     "build:dev": "cross-env PUBLIC_URL='/' npm run build:simple",
     "preserve": "npm run build",
     "serve": "serve dist",
-    "serve:dist": "serve dist"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/lab-mi/attestation-deplacement-derogatoire-covid-19"
+    "serve:dist": "serve dist",
+    "deploy": "gh-pages -d build"
   },
   "keywords": [],
   "author": "",
+  "homepage": "https://moktarace.github.io/zabriskie",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/lab-mi/attestation-deplacement-derogatoire-covid-19/issues"
-  },
   "devDependencies": {
     "@babel/core": "^7.12.3",
     "@babel/plugin-transform-runtime": "^7.12.1",
@@ -44,6 +37,7 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-standard": "^4.0.2",
+    "gh-pages": "^3.1.0",
     "npm-run-all": "^4.1.5",
     "parcel-bundler": "^1.12.4",
     "parcel-plugin-sw-cache": "^0.3.1",

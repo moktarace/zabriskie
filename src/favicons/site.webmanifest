@@ -1,8 +1,10 @@
 {
-    "name": "Générateur d'attestation de déplacement dérogatoire",
-    "short_name": "Déplacement covid-19",
-    "description": "L'application officielle du gouvernement pour la génération d'attestation de déplacement dérogatoire dématérialisée.",
-    "categories": ["government", "health"],
+    "name": "Zabriskie",
+    "short_name": "Zabriskie",
+    "description": "",
+    "categories": [
+        ""
+    ],
     "lang": "fr-FR",
     "icons": [
         {
