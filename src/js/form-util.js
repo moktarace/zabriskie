@@ -1,7 +1,7 @@
 import removeAccents from 'remove-accents'
 
 import { $, $$, downloadBlob } from './dom-utils'
-import { addSlash, getFormattedDate } from './util'
+import { getFormattedDate } from './util'
 import { generatePdf } from './pdf-util'
 import SecureLS from 'secure-ls'
 let context = 'curfew'
@@ -15,12 +15,6 @@ const conditions = {
   '#field-lastname': {
     length: 1,
   },
-  '#field-birthday': {
-    pattern: /^([0][1-9]|[1-2][0-9]|30|31)\/([0][1-9]|10|11|12)\/(19[0-9][0-9]|20[0-1][0-9]|2020)/g,
-  },
-  '#field-placeofbirth': {
-    length: 1,
-  },
   '#field-address': {
     length: 1,
   },
@@ -29,16 +23,10 @@ const conditions = {
   },
   '#field-zipcode': {
     pattern: /\d{5}/g,
-  },
-  '#field-datesortie': {
-    pattern: /\d{4}-\d{2}-\d{2}/g,
-  },
-  '#field-heuresortie': {
-    pattern: /\d{2}:\d{2}/g,
-  },
+  }
 }
 
-function validateAriaFields () {
+function validateAriaFields() {
   return Object.keys(conditions)
     .map((field) => {
       const fieldData = conditions[field]
@@ -58,7 +46,7 @@ function validateAriaFields () {
     .includes(true)
 }
 
-function updateSecureLS (formInputs) {
+function updateSecureLS(formInputs) {
   if (wantDataToBeStored() === true) {
     secureLS.set('profile', getProfile(formInputs))
   } else {
@@ -66,22 +54,22 @@ function updateSecureLS (formInputs) {
   }
 }
 
-function clearSecureLS () {
+function clearSecureLS() {
   secureLS.clear()
 }
 
-function clearForm () {
+function clearForm() {
   const formProfile = $('#form-profile')
   formProfile.reset()
   storeDataInput.checked = false
 }
 
-function setCurrentDate (releaseDateInput) {
+function setCurrentDate(releaseDateInput) {
   const currentDate = new Date()
   releaseDateInput.value = getFormattedDate(currentDate)
 }
 
-function showSnackbar (snackbarToShow, showDuration = 6000) {
+function showSnackbar(snackbarToShow, showDuration = 6000) {
   snackbarToShow.classList.remove('d-none')
   setTimeout(() => snackbarToShow.classList.add('show'), 100)
 
@@ -91,16 +79,12 @@ function showSnackbar (snackbarToShow, showDuration = 6000) {
   }, showDuration)
 }
 
-export function wantDataToBeStored () {
+export function wantDataToBeStored() {
   return storeDataInput.checked
 }
 
-export function setReleaseDateTime (releaseDateInput) {
-  const loadedDate = new Date()
-  releaseDateInput.value = getFormattedDate(loadedDate)
-}
 
-export function toAscii (string) {
+export function toAscii(string) {
   if (typeof string !== 'string') {
     throw new Error('Need string')
   }
@@ -109,7 +93,7 @@ export function toAscii (string) {
   return asciiString
 }
 
-export function getProfile (formInputs) {
+export function getProfile(formInputs) {
   const fields = {}
   for (const field of formInputs) {
     let value = field.value
@@ -125,14 +109,14 @@ export function getProfile (formInputs) {
   return fields
 }
 
-export function getReasons (reasonInputs) {
+export function getReasons(reasonInputs) {
   const reasons = reasonInputs
     .filter(input => input.checked)
     .map(input => input.value).join(', ')
   return reasons
 }
 
-export function prepareInputs (formInputs, reasonInputs, reasonFieldsetsWrapper, reasonAlerts, snackbar, releaseDateInput, contextWrapper) {
+export function prepareInputs(formInputs, reasonInputs, reasonFieldsetsWrapper, reasonAlerts, snackbar, releaseDateInput, contextWrapper) {
   const lsProfile = secureLS.get('profile')
 
   // Continue to store data if already stored
@@ -154,22 +138,6 @@ export function prepareInputs (formInputs, reasonInputs, reasonFieldsetsWrapper,
     }
   })
 
-  $('#field-birthday').addEventListener('keyup', function (event) {
-    event.preventDefault()
-    const input = event.target
-    const key = event.keyCode || event.charCode
-    if (key !== 8 && key !== 46) {
-      input.value = addSlash(input.value)
-    }
-  })
-
-  reasonInputs.forEach(radioInput => {
-    radioInput.addEventListener('change', function (event) {
-      const isInError = reasonInputs.every(input => !input.checked)
-      reasonFieldsetsWrapper.classList.toggle('fieldset-error', isInError)
-      reasonAlerts.map(reasonAlert => reasonAlert.classList.toggle('hidden', !isInError))
-    })
-  })
   $('#cleardata').addEventListener('click', () => {
     clearSecureLS()
     clearForm()
@@ -182,24 +150,12 @@ export function prepareInputs (formInputs, reasonInputs, reasonFieldsetsWrapper,
   $('#generate-btn').addEventListener('click', async (event) => {
     event.preventDefault()
 
-    if ($$('.targeted').length === 0) {
-      contextWrapper.classList.add('context-wrapper-error')
-    }
-
-    const reasons = getReasons(reasonInputs)
-    if (!reasons) {
-      reasonFieldsetsWrapper.classList.add('fieldset-error')
-      reasonAlerts.map(reasonAlert => reasonAlert.classList.remove('hidden'))
-      // reasonFieldsetsWrapper.scrollIntoView && reasonFieldsetsWrapper.scrollIntoView()
-      return
-    }
-
     const invalid = validateAriaFields()
     if (invalid) {
       return
     }
     updateSecureLS(formInputs)
-    const pdfBlob = await generatePdf(getProfile(formInputs), reasons, context)
+    const pdfBlob = await generatePdf(getProfile(formInputs))
 
     const creationInstant = new Date()
     const creationDate = creationInstant.toLocaleDateString('fr-CA')
@@ -211,43 +167,9 @@ export function prepareInputs (formInputs, reasonInputs, reasonFieldsetsWrapper,
     showSnackbar(snackbar, 6000)
   })
 
-  const curfewFieldset = $('#curfew-reason-fieldset')
-  const quarantineFieldset = $('#quarantine-reason-fieldset')
-  const curfewSubtitle = $('.curfew-subtitle')
-  const quarantineSubtitle = $('.quarantine-subtitle')
-
-  // contextWrapper.classList.remove('context-wrapper-error')
-  // reasonFieldsetsWrapper.classList.toggle('hidden', false)
-
-  // curfewFieldset.classList.toggle('in-quarantine', false)
-  // curfewFieldset.classList.toggle('targeted', true)
-  // quarantineFieldset.classList.toggle('targeted', false)
-  // curfewSubtitle.classList.toggle('hidden', false)
-  // quarantineSubtitle.classList.toggle('hidden', true)
-
-  $$('.context-button').map(anchor => anchor.addEventListener('click', (event) => {
-    contextWrapper.classList.remove('context-wrapper-error')
-    reasonFieldsetsWrapper.classList.toggle('hidden', false)
-    if (event.target.className.includes('curfew-button')) {
-      context = 'curfew'
-      // curfewFieldset.classList.toggle('in-quarantine', false)
-      curfewFieldset.classList.toggle('targeted', true)
-      quarantineFieldset.classList.toggle('targeted', false)
-      curfewSubtitle.classList.toggle('hidden', false)
-      quarantineSubtitle.classList.toggle('hidden', true)
-    }
-    if (event.target.className.includes('quarantine-button')) {
-      context = 'quarantine'
-      // curfewFieldset.classList.toggle('in-quarantine', true)
-      curfewFieldset.classList.toggle('targeted', false)
-      quarantineFieldset.classList.toggle('targeted', true)
-      curfewSubtitle.classList.toggle('hidden', true)
-      quarantineSubtitle.classList.toggle('hidden', false)
-    }
-  }))
 }
 
-export function prepareForm () {
+export function prepareForm() {
   const formInputs = $$('#form-profile input')
   const snackbar = $('#snackbar')
   const reasonInputs = [...$$('input[name="field-reason"]')]
@@ -255,6 +177,5 @@ export function prepareForm () {
   const reasonAlerts = $$('.msg-alert')
   const releaseDateInput = $('#field-datesortie')
   const contextWrapper = $('.context-wrapper')
-  setReleaseDateTime(releaseDateInput)
   prepareInputs(formInputs, reasonInputs, reasonFieldsetsWrapper, reasonAlerts, snackbar, releaseDateInput, contextWrapper)
 }

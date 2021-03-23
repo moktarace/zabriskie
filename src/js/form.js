@@ -88,12 +88,6 @@ const createReasonField = (reasonData, context) => {
   }
   const inputReason = createElement('input', inputReasonAttrs)
 
-  // const titleAttrs = { innerHTML: reasonData.title }
-  // const title = createElement('h4', titleAttrs)
-  // const labelAttrs = { innerHTML: reasonData.label, className: 'form-checkbox-label', for: id }
-  // const label = createElement('label', labelAttrs)
-  // const filtertitre = titreAttrs.filter(field => field !== undefined)
-
   if (reasonData.type === 'title') {
     const titleAttrs = { innerHTML: reasonData.label, className: 'group-reason' }
     const title = createElement('h5', titleAttrs)
@@ -103,9 +97,6 @@ const createReasonField = (reasonData, context) => {
     const label = createElement('label', labelAttrs)
     appendToReason([inputReason, label])
   }
-  // appendToReason([inputReason, title, label])
-  // console.log(reasonData.type)
-  // appendToReason(reasonData.title ? [inputReason, title, label] : [inputReason, label])
   return formReason
 }
 
@@ -132,9 +123,7 @@ const createReasonFieldset = (reasonsData, sanitaryContextData) => {
   const textAlertAttrs = { className: 'msg-alert hidden', innerHTML: 'Veuillez choisir un motif' }
   const textAlert = createElement('p', textAlertAttrs)
 
-  const reasonsFields = reasonsData.items.map(createReasonField, reasonsData.key)
-
-  appendToFieldset([textSubscribeReason, legend, textAlert, ...reasonsFields])
+  appendToFieldset([textSubscribeReason, legend, textAlert])
   // Créer un form-checkbox par motif
   return fieldset
 }
@@ -146,16 +135,11 @@ const createReasonFieldsetQuarantine = (reasonsData) => {
   }
 
   const fieldset = createElement('fieldset', fieldsetAttrs)
-  const appendToFieldset = appendTo(fieldset)
 
-  const reasonsFields = reasonsData.items.map(createReasonField, reasonsData.key)
-
-  appendToFieldset([...reasonsFields])
-  // Créer un form-checkbox par motif
   return fieldset
 }
 
-export function createForm () {
+export function createForm() {
   const form = $('#form-profile')
   // Évite de recréer le formulaire s'il est déjà créé par react-snap (ou un autre outil de prerender)
   if (form.innerHTML !== '') {
@@ -180,46 +164,9 @@ export function createForm () {
       return formGroup
     })
 
-  const reasonsDataCurfew = formData
-    .flat(1)
-    .find(field => field.key === 'reason-curfew')
 
-  const reasonsDataQuarantine = formData
-    .flat(1)
-    .find(field => field.key === 'reason-quarantine')
 
-  const reasonFieldsetCurfew = createReasonFieldset(reasonsDataCurfew)
-  const reasonFieldsetQuarantine = createReasonFieldsetQuarantine(reasonsDataQuarantine)
-  const curfewButton = createElement('button', { type: 'button', className: 'curfew-button  context-button  btn', innerHTML: 'Couvre-feu  <br/> (19h-6h)' })
-  // const curfewLink = document.createTextNode('Couvre-feu  (19h-6h)')
-  // curfewButton.appendChild(curfewButton)
-  const quarantineButton = createElement('button', { type: 'button', className: 'quarantine-button  context-button  btn', innerHTML: 'Journée <br/> (6h-19h)' })
-  // const quarantineLink = document.createTextNode('Journée (6h-19h)')
-  // quarantineButton.appendChild(quarantineButton)
-  const buttonWrapper = createElement('div', { className: 'button-wrapper' })
-  buttonWrapper.appendChild(curfewButton)
-  buttonWrapper.appendChild(quarantineButton)
-  const contextTitle = createElement('p', { className: 'context-title' })
-  const contextTitleText = document.createTextNode('Choisissez un contexte')
-  contextTitle.appendChild(contextTitleText)
-  const contextSubtitle = createElement('p', { className: 'context-subtitle' })
-  // const contextSubtitleText = document.createTextNode('* Le contexte "Week-end (6h-18h)" ne s\'applique qu\'aux territoires concernés par des dispositions spécifiques')
-  // contextSubtitle.appendChild(contextSubtitleText)
-  const contextWrapper = createElement('div', { className: 'context-wrapper' })
-  contextWrapper.appendChild(contextTitle)
-  contextWrapper.appendChild(contextSubtitle)
-  contextWrapper.appendChild(buttonWrapper)
   const reasonFielsetWrapper = createElement('div', { className: 'fieldset-wrapper  hidden' })
 
-  const quarantineSubtitle = createElement('div', { className: 'quarantine-subtitle  hidden' })
-  const quarantineSubtitleText = document.createTextNode('J\'effectue un déplacement le week-end entre 06h00 et 19h00 sur un territoire soumis au confinement')
-  quarantineSubtitle.appendChild(quarantineSubtitleText)
-  const curfewSubtitle = createElement('div', { className: 'curfew-subtitle  hidden' })
-  const curfewSubtitleText = document.createTextNode('J\'effectue un déplacement entre 19h00 et 06h00 sur un territoire soumis au couvre-feu.')
-  curfewSubtitle.appendChild(curfewSubtitleText)
-  reasonFieldsetCurfew.prepend(quarantineSubtitle)
-  reasonFieldsetCurfew.prepend(curfewSubtitle)
-  reasonFielsetWrapper.appendChild(reasonFieldsetCurfew)
-  reasonFielsetWrapper.appendChild(reasonFieldsetQuarantine)
-  appendToForm([...createTitle(), ...formFirstPart, contextWrapper, reasonFielsetWrapper])
+  appendToForm([...createTitle(), ...formFirstPart, reasonFielsetWrapper])
 }
